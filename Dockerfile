@@ -32,3 +32,4 @@ RUN cd LabelMeAnnotationTool; make
 RUN cp -a /LabelMeAnnotationTool /var/www/LabelMeAnnotationTool
 
 # Access at http://127.0.0.1:PORT/LabelMeAnnotationTool/tool.html
+# service apache2 restart 
