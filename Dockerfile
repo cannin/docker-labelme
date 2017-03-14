@@ -19,17 +19,28 @@ RUN apt-get -y install apache2
 RUN apt-get -y install libapache2-mod-perl2
 RUN apt-get -y install php5 libapache2-mod-php5
 
-# Configure Apache
-COPY 000-default.conf /etc/apache2/sites-available/000-default.conf
-COPY httpd.conf /etc/apache2/httpd.conf
-RUN a2enmod include
-RUN a2enmod rewrite
-RUN a2enmod cgi
+# Install Supervisor
+RUN apt-get install -y supervisor
+RUN mkdir -p /var/log/supervisor
 
 # Get LabelMe
 RUN git clone https://github.com/CSAILVision/LabelMeAnnotationTool.git LabelMeAnnotationTool
 RUN cd LabelMeAnnotationTool; make
 RUN cp -a /LabelMeAnnotationTool /var/www/LabelMeAnnotationTool
 
+# Configure Apache
+COPY 000-default.conf /etc/apache2/sites-available/000-default.conf
+COPY httpd.conf /etc/apache2/httpd.conf
+RUN a2enmod include
+RUN a2enmod rewrite
+RUN a2enmod cgi
+RUN mkdir -p /var/lock/apache2 /var/run/apache2
+
 # Access at http://127.0.0.1:PORT/LabelMeAnnotationTool/tool.html
-# service apache2 restart 
+# service apache2 restart
+
+# Configure supervisor
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+EXPOSE 80
+CMD ["/usr/bin/supervisord"]
